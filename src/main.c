@@ -184,7 +184,9 @@ int main()
 	Board_factory_Init();
 	EXTI_Configuration();
 
+#if defined(EEPROM_ENABLE)
     I2C_Init();
+#endif
 
 	/* Load Configure Information */
 	load_S2E_Packet_from_storage();
