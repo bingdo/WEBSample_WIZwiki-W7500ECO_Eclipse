@@ -13,7 +13,7 @@
 
 int read_storage(uint8_t isConfig, void *data, uint16_t size)
 {
-#if 0
+#if !defined(EEPROM_ENABLE)
 	uint32_t address;
 
 	if(isConfig == 1) {
@@ -63,7 +63,7 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
 
 int write_storage(uint8_t isConfig, void *data, uint16_t size)
 {
-#if 0
+#if !defined(EEPROM_ENABLE)
 	uint32_t address;
 	int ret;
 

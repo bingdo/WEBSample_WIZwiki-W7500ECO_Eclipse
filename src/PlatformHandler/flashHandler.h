@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 //#define MULTIFLASH_ENABLE
+#define EEPROM_ENABLE
 
 #define IAP_ENTRY 			0x1FFF1001            // Because Thum code
 #define IAP_ERAS            0x010
