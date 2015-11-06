@@ -35,27 +35,21 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
 #else
 	uint8_t address;
 	int ret=0;
-	uint8_t Receive_Data[256];
+	uint8_t Receive_Data[EEPROM_BLOCK_SIZE];
 
-	if(isConfig == 1) {
-		address = 0x00;
-	}
-	else {
-		address = 0x90;
-	}
+	if(size > EEPROM_BLOCK_SIZE)
+		size = EEPROM_BLOCK_SIZE;
+
+	memset(&Receive_Data[0], 0x00, EEPROM_BLOCK_SIZE);
+	address = 0x00;
 
     delay(10);
-	ret = I2C_Read(address, &Receive_Data[0], size);
+	ret = I2C_Read(isConfig, address, &Receive_Data[0], size);
 
 	memcpy(data, &Receive_Data[0], size);
 
-    delay(10);
-	if(isConfig == 1) {
-		write_storage(1, Receive_Data, size);
-	}
-	else {
-		write_storage(0, Receive_Data, size);
-	}
+	delay(10);
+	write_storage(isConfig, Receive_Data, size);
 
 	return ret;
 #endif
@@ -90,41 +84,41 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 	ret = write_flash(address, data, size);
 #else
 	int ret;
-	uint8_t Transmit_Data[256];
+	uint8_t page, rest, i, address;
+	uint8_t Transmit_Data[EEPROM_BLOCK_SIZE];
+
+	memset(&Transmit_Data[0], 0x00, EEPROM_BLOCK_SIZE);
 	memcpy(&Transmit_Data[0], data, size);
 
-	if(isConfig == 1) {
-		ret = I2C_Write(0x00, &Transmit_Data[0], 16);
-		delay(10);
-		ret = I2C_Write(0x10, &Transmit_Data[16], 16);
-		delay(10);
-		ret = I2C_Write(0x20, &Transmit_Data[32], 16);
-		delay(10);
-		ret = I2C_Write(0x30, &Transmit_Data[48], 16);
-		delay(10);
-		ret = I2C_Write(0x40, &Transmit_Data[64], 16);
-		delay(10);
-		ret = I2C_Write(0x50, &Transmit_Data[80], 16);
-		delay(10);
-		ret = I2C_Write(0x60, &Transmit_Data[96], 16);
-		delay(10);
-		ret = I2C_Write(0x70, &Transmit_Data[112], 16);
-		delay(10);
-		ret = I2C_Write(0x80, &Transmit_Data[128], 5);
-		delay(10);
+	if(size > EEPROM_BLOCK_SIZE)
+		size = EEPROM_BLOCK_SIZE;
+
+	page = size/EEPROM_PAGE_SIZE;
+	rest = size%EEPROM_PAGE_SIZE;
+
+	address = 0;
+
+	if(size < EEPROM_PAGE_SIZE)
+	{
+		ret = I2C_Write(isConfig, address, &Transmit_Data[0], size);
+	    delay(10);
 	}
 	else
 	{
-		ret = I2C_Write(0x90, &Transmit_Data[0], 16);
-		delay(10);
-		ret = I2C_Write(0xA0, &Transmit_Data[16], 16);
-		delay(10);
-		ret = I2C_Write(0xB0, &Transmit_Data[32], 16);
-		delay(10);
-		ret = I2C_Write(0xC0, &Transmit_Data[48], 16);
-		delay(10);
-		ret = I2C_Write(0xD0, &Transmit_Data[64], 5);
-		delay(10);
+		for(i=0; i<page; i++)
+		{
+			address += i*EEPROM_PAGE_SIZE;
+			ret = I2C_Write(isConfig, address, &Transmit_Data[address], EEPROM_PAGE_SIZE);
+		    delay(10);
+		}
+
+		if(rest != 0)
+		{
+			i++;
+			address += i*EEPROM_PAGE_SIZE;
+			ret = I2C_Write(isConfig, address, &Transmit_Data[address], rest);
+		    delay(10);
+		}
 	}
 #endif
 
