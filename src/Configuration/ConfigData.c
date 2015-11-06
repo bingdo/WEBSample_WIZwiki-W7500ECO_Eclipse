@@ -203,7 +203,6 @@ void check_mac_address()
 	uint8_t buf[13], ret = 0;
 	uint32_t i, j;
 
-    printf("[DB] mac:0x%.2X:0x%.2X:0x%.2X", s2e_packet.network_info_common.mac[0], s2e_packet.network_info_common.mac[1], s2e_packet.network_info_common.mac[2]);
 	if(s2e_packet.network_info_common.mac[0] != 0x00 || s2e_packet.network_info_common.mac[1] != 0x08 || s2e_packet.network_info_common.mac[2] != 0xDC) {
 		do{
 			myprintf("Input MAC ? ");

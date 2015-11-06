@@ -33,23 +33,27 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
 
 	return read_flash(address, data, size);
 #else
-	uint8_t address;
-	int ret=0;
+	int ret=0, i;
 	uint8_t Receive_Data[EEPROM_BLOCK_SIZE];
 
 	if(size > EEPROM_BLOCK_SIZE)
 		size = EEPROM_BLOCK_SIZE;
 
 	memset(&Receive_Data[0], 0x00, EEPROM_BLOCK_SIZE);
-	address = 0x00;
 
-    delay(10);
-	ret = I2C_Read(isConfig, address, &Receive_Data[0], size);
+    for(i=0; i<size; i++)
+    {
+    	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
+    }
 
 	memcpy(data, &Receive_Data[0], size);
 
-	delay(10);
-	write_storage(isConfig, Receive_Data, size);
+#if 0
+    printf("[DB R] ");
+	for(i=0; i<133; i++)
+		printf("0x%.2X ",Receive_Data[i]);
+	printf("\r\n");
+#endif
 
 	return ret;
 #endif
@@ -83,8 +87,8 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 
 	ret = write_flash(address, data, size);
 #else
-	int ret;
-	uint8_t page, rest, i, address;
+	int ret=0;
+	uint8_t page, rest, i, addr;
 	uint8_t Transmit_Data[EEPROM_BLOCK_SIZE];
 
 	memset(&Transmit_Data[0], 0x00, EEPROM_BLOCK_SIZE);
@@ -96,28 +100,25 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 	page = size/EEPROM_PAGE_SIZE;
 	rest = size%EEPROM_PAGE_SIZE;
 
-	address = 0;
+	addr = 0;
 
 	if(size < EEPROM_PAGE_SIZE)
 	{
-		ret = I2C_Write(isConfig, address, &Transmit_Data[0], size);
-	    delay(10);
+		ret = I2C_Write(isConfig, addr, &Transmit_Data[0], size);
 	}
 	else
 	{
 		for(i=0; i<page; i++)
 		{
-			address += i*EEPROM_PAGE_SIZE;
-			ret = I2C_Write(isConfig, address, &Transmit_Data[address], EEPROM_PAGE_SIZE);
-		    delay(10);
+			addr = i*EEPROM_PAGE_SIZE;
+			ret = I2C_Write(isConfig, addr, &Transmit_Data[addr], EEPROM_PAGE_SIZE);
 		}
 
 		if(rest != 0)
 		{
 			i++;
-			address += i*EEPROM_PAGE_SIZE;
-			ret = I2C_Write(isConfig, address, &Transmit_Data[address], rest);
-		    delay(10);
+			addr = i*EEPROM_PAGE_SIZE;
+			ret = I2C_Write(isConfig, addr, &Transmit_Data[addr], rest);
 		}
 	}
 #endif
