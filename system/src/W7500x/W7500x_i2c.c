@@ -183,9 +183,12 @@ uint8_t I2C_ReadByte(uint8_t ack)
     return receive;
 }
 
-int I2C_Write(uint8_t addr, uint8_t* data, uint8_t len)
+int I2C_Write(uint8_t block, uint8_t addr, uint8_t* data, uint8_t len)
 {
 	uint32_t i;
+	uint8_t bsb;
+
+	bsb = block<<1;
 
 	if(len>16)
 		len = 16;
@@ -193,7 +196,7 @@ int I2C_Write(uint8_t addr, uint8_t* data, uint8_t len)
 	I2C_Start();
 
 	//Write control
-    I2C_WriteByte(0xA0);
+    I2C_WriteByte(0xA0+bsb);
     I2C_Wait_Ack();
 
     //Write address
@@ -212,14 +215,17 @@ int I2C_Write(uint8_t addr, uint8_t* data, uint8_t len)
     return 0;//success
 }
 
-int I2C_Read(uint8_t addr, uint8_t* data, uint32_t len)
+int I2C_Read(uint8_t block, uint8_t addr, uint8_t* data, uint32_t len)
 {
 	uint32_t i;
+	uint8_t bsb;
+
+	bsb = block<<1;
 
 	I2C_Start();
 	//Write control
 
-	I2C_WriteByte(0xA0);
+	I2C_WriteByte(0xA0+bsb);
     I2C_Wait_Ack();
 
     //Write address
@@ -229,7 +235,7 @@ int I2C_Read(uint8_t addr, uint8_t* data, uint32_t len)
     I2C_Start();
 
     //Write control
-    I2C_WriteByte(0xA1);
+    I2C_WriteByte(0xA1+bsb);
     I2C_Wait_Ack();
 
     //Read data

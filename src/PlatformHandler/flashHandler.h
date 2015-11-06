@@ -32,6 +32,10 @@
 #define FLASH_APP_PAGE		(FLASH_PAGE - FLASH_BOOT_PAGE - FLASH_CONFIG_PAGE)
 #endif
 
+#define EEPROM_BLOCK_SIZE       	256
+#define EEPROM_BLOCK_COUNT       	2
+#define EEPROM_PAGE_SIZE       		16
+
 #if defined(MULTIFLASH_ENABLE)
 typedef struct __Probe_Flash {
 	uint32_t flash_page0_base;
