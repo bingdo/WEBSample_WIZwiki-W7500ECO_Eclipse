@@ -241,9 +241,12 @@ int I2C_Read(uint8_t block, uint8_t addr, uint8_t* data, uint32_t len)
     //Read data
     for(i=0; i<len; i++)
     {
-    	data[i] = I2C_ReadByte(0);
+    	if(i == (len-1))
+    		data[i] = I2C_ReadByte(0);
+    	else
+    		data[i] = I2C_ReadByte(1);
     }
-	//I2C_SendNACK();
+
     I2C_Stop();
     
     return 0;//success
