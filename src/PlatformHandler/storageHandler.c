@@ -45,6 +45,7 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
     {
     	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
     }
+    //ret = I2C_Read(isConfig, 0x00, &Receive_Data[0], size);
 
 	memcpy(data, &Receive_Data[0], size);
 
