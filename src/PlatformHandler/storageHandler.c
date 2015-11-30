@@ -41,11 +41,11 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
 
 	memset(&Receive_Data[0], 0x00, EEPROM_BLOCK_SIZE);
 
-    for(i=0; i<size; i++)
-    {
-    	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
-    }
-    //ret = I2C_Read(isConfig, 0x00, &Receive_Data[0], size);
+    //for(i=0; i<size; i++)
+    //{
+    //	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
+    //}
+    ret = I2C_Read(isConfig, 0x00, &Receive_Data[0], size);
 
 	memcpy(data, &Receive_Data[0], size);
 
@@ -106,6 +106,7 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 	if(size < EEPROM_PAGE_SIZE)
 	{
 		ret = I2C_Write(isConfig, addr, &Transmit_Data[0], size);
+		delay(10);
 	}
 	else
 	{
@@ -113,13 +114,14 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 		{
 			addr = i*EEPROM_PAGE_SIZE;
 			ret = I2C_Write(isConfig, addr, &Transmit_Data[addr], EEPROM_PAGE_SIZE);
+			delay(10);
 		}
 
 		if(rest != 0)
 		{
-			i++;
-			addr = i*EEPROM_PAGE_SIZE;
+			addr = page*EEPROM_PAGE_SIZE;
 			ret = I2C_Write(isConfig, addr, &Transmit_Data[addr], rest);
+			delay(10);
 		}
 	}
 #endif
