@@ -54,9 +54,5 @@ void I2C_SendNACK(void);
 void I2C_WriteByte(uint8_t data);
 uint8_t I2C_ReadByte(uint8_t ack);
 
-int I2C_Write(uint8_t block, uint8_t addr, uint8_t* data, uint8_t len);
-int I2C_Read(uint8_t block, uint8_t addr, uint8_t* data, uint32_t len);
-
-
- #endif //__W7500X_I2C_H
+#endif //__W7500X_I2C_H
 
