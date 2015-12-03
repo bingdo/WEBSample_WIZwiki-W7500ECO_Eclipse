@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 //#define MULTIFLASH_ENABLE
-#define EEPROM_ENABLE
 
 #define IAP_ENTRY 			0x1FFF1001            // Because Thum code
 #define IAP_ERAS            0x010
@@ -31,10 +30,6 @@
 #define IO_PAGE_ADDR		(0x00000000+(FLASH_PAGE_SIZE*506))	// Page 506,507
 #define FLASH_APP_PAGE		(FLASH_PAGE - FLASH_BOOT_PAGE - FLASH_CONFIG_PAGE)
 #endif
-
-#define EEPROM_BLOCK_SIZE       	256
-#define EEPROM_BLOCK_COUNT       	2
-#define EEPROM_PAGE_SIZE       		16
 
 #if defined(MULTIFLASH_ENABLE)
 typedef struct __Probe_Flash {

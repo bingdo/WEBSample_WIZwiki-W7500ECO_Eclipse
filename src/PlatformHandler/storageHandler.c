@@ -41,11 +41,11 @@ int read_storage(uint8_t isConfig, void *data, uint16_t size)
 
 	memset(&Receive_Data[0], 0x00, EEPROM_BLOCK_SIZE);
 
-    //for(i=0; i<size; i++)
-    //{
-    //	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
-    //}
-    ret = I2C_Read(isConfig, 0x00, &Receive_Data[0], size);
+    for(i=0; i<size; i++)
+    {
+    	ret = I2C_Read(isConfig, i, &Receive_Data[i], 1);
+    }
+    //ret = I2C_Read(isConfig, 0x00, &Receive_Data[0], size);
 
 	memcpy(data, &Receive_Data[0], size);
 
@@ -127,4 +127,73 @@ int write_storage(uint8_t isConfig, void *data, uint16_t size)
 #endif
 
 	return ret;
+}
+
+int I2C_Write(uint8_t block, uint8_t addr, uint8_t* data, uint8_t len)
+{
+	uint32_t i;
+	uint8_t bsb;
+
+	bsb = block<<1;
+
+	if(len>EEPROM_PAGE_SIZE)
+		len = EEPROM_PAGE_SIZE;
+
+	I2C_Start();
+
+	//Write control
+    I2C_WriteByte(0xA0+bsb);
+    I2C_Wait_Ack();
+
+    //Write address
+    I2C_WriteByte(addr);
+    I2C_Wait_Ack();
+
+    //Write data
+	for(i=0; i<len; i++)
+	{
+		I2C_WriteByte(data[i]);
+		I2C_Wait_Ack();
+	}
+
+    I2C_Stop();
+
+    return 0;//success
+}
+
+int I2C_Read(uint8_t block, uint8_t addr, uint8_t* data, uint32_t len)
+{
+	uint32_t i;
+	uint8_t bsb;
+
+	bsb = block<<1;
+
+	I2C_Start();
+
+	//Write control
+	I2C_WriteByte(0xA0+bsb);
+    I2C_Wait_Ack();
+
+    //Write address
+    I2C_WriteByte(addr);
+    I2C_Wait_Ack();
+
+    I2C_Start();
+
+    //Write control
+    I2C_WriteByte(0xA1+bsb);
+    I2C_Wait_Ack();
+
+    //Read data
+    for(i=0; i<len; i++)
+    {
+    	if(i == (len-1))
+    		data[i] = I2C_ReadByte(0);
+    	else
+    		data[i] = I2C_ReadByte(1);
+    }
+
+    I2C_Stop();
+
+    return 0;//success
 }
